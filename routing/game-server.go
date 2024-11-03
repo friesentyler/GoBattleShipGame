@@ -12,6 +12,13 @@ func main() {
 
 	var game battleship.Game
 
+	r.GET("/", func(c *gin.Context) {
+		r.LoadHTMLFiles("templates/index.html")
+		c.HTML(http.StatusOK, "index.html", gin.H{
+			"title": "Main website",
+		})
+	})
+
 	r.POST("/start", func(c *gin.Context) {
 		game = battleship.Game{}
 		battleship.PlaceShips(&game.PlayerBoard)
