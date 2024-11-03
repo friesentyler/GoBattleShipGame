@@ -1,12 +1,13 @@
-package main
+package battleship
 
 import (
-	"fmt"
+	"math/rand"
+	"time"
 )
 
 const BoardSize = 10
 
-ShipSize := map[string]int {
+var ShipSizes = map[string]int {
 	"Carrier": 5,
 	"Battleship": 4,
 	"Cruiser": 3,
@@ -24,7 +25,7 @@ type Game struct {
 }
 
 // Function to randomly place ships on the board
-func placeShips(board *Board) {
+func PlaceShips(board *Board) {
 	rand.Seed(time.Now().UnixNano())
 
 	for name, size := range ShipSizes {
