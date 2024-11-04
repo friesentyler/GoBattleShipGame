@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 
 	"go-test-server/battleship"
 )
@@ -27,6 +28,39 @@ func main() {
 			"message": "Game Started!",
 			"player_board": game.PlayerBoard,
 		})
+	})
+
+	r.POST("/move", func(c *gin.Context) {
+		rowStr := c.Query("row")
+		colStr := c.Query("col")
+
+		row, err1 := strconv.Atoi(rowStr)
+		col, err2 := strconv.Atoi(colStr)
+
+		if err1 != nil || err2 != nil || row < 0 || row >= battleship.BoardSize || col < 0 || col >= battleship.BoardSize {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid row or column"})
+			return
+		}
+
+		playerResult := game.CheckMove(&game.ComputerBoard, row, col)
+
+		compRow, compCol, compResult := game.ComputerMove()
+
+		c.JSON(http.StatusOK, gin.H{
+			"player_move": gin.H{
+				"row": row,
+				"col": col,
+				"result": playerResult,
+			},
+			"computer_move": gin.H{
+				"row": compRow,
+				"col": compCol,
+				"result": compResult,
+			},
+			"player_board": game.PlayerBoard,
+			"computer_board": game.ComputerBoard,
+		})
+
 	})
 
 	r.Run(":8080")

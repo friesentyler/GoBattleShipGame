@@ -76,3 +76,27 @@ func placeShip(board *Board, row, col, size, orientation int, name string) {
 		}
 	}
 }
+
+func (g *Game) CheckMove(board *Board, row int, col int) string {
+	if board[row][col] != "" && board[row][col] != "X" && board[row][col] != "O" {
+		shipName := board[row][col]
+		board[row][col] = "X"
+		g.PlayerHits++
+		return "Hit " + shipName + "!"
+	}
+	board[row][col] = "O"
+	return "Miss!"
+}
+
+func (g *Game) ComputerMove() (int, int, string) {
+	rand.Seed(time.Now().UnixNano())
+	for {
+		row := rand.Intn(BoardSize)
+		col := rand.Intn(BoardSize)
+
+		if g.PlayerBoard[row][col] == "" || g.PlayerBoard[row][col] != "X" && g.PlayerBoard[row][col] != "O" {
+			result := g.CheckMove(&g.PlayerBoard, row, col)
+			return row, col, result
+		}
+	}
+}
