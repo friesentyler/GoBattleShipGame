@@ -3,9 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Battleship Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        td {
+            width: 30px;
+            height: 30px;
+            border: 1px solid black;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .hit {
+            background-color: red;
+        }
+        .miss {
+            background-color: lightblue;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello World!</h1>
+
+    <h1>Battleship</h1>
+
+    <button id="start-game">Start Game</button>
+
+    <div id="boards" style="display: none;">
+        <h2>Player's Board</h2>
+        <table id="player-board"></table>
+
+        <h2>Computer's Board</h2>
+        <table id="computer-board"></table>
+
+        <div>
+            <h3>Make Your Move</h3>
+            <label for="row">Row (0-9):</label>
+            <input type="number" id="row" min="0" max="9">
+            <label for="col">Column (0-9):</label>
+            <input type="number" id="col" min="0" max="9">
+            <button id="make-move">Fire!</button>
+        </div>
+
+        <div id="move-result"></div>
+    </div>
+
+    <script>
+        const startGameBtn = document.getElementById("start-game");
+        const makeMoveBtn = document.getElementById("make-move");
+        const playerBoardTable = document.getElementById("player-board");
+        const computerBoardTable = document.getElementById("computer-board");
+        const boardsDiv = document.getElementById("boards");
+        const moveResultDiv = document.getElementById("move-result");
+
+        // Start Game Event
+        startGameBtn.addEventListener("click", () => {
+            fetch('/start', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                boardsDiv.style.display = "block";
+                renderBoard(playerBoardTable, data.player_board, false); // Render player board
+                renderBoard(computerBoardTable, null, true); // Initialize computer board (hidden)
+            });
+        });
+
+        // Make Move Event
+        makeMoveBtn.addEventListener("click", () => {
+            const row = document.getElementById("row").value;
+            const col = document.getElementById("col").value;
+
+            if (row === "" || col === "") {
+                alert("Please enter both row and column!");
+                return;
+            }
+
+            fetch(`/move?row=${row}&col=${col}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                moveResultDiv.innerHTML = `<p>Player Move: ${data.player_move.result}</p>
+                                           <p>Computer Move: ${data.computer_move.result} at (${data.computer_move.row}, ${data.computer_move.col})</p>`;
+                renderBoard(playerBoardTable, data.computer_board, false); // Update computer board
+                renderBoard(computerBoardTable, data.computer_board, true); // Update player board
+            });
+        });
+
+        // Function to render the board as a table
+        function renderBoard(table, board, hideShips) {
+            table.innerHTML = ""; // Clear existing table content
+
+            for (let row = 0; row < 10; row++) {
+                const tr = document.createElement("tr");
+                for (let col = 0; col < 10; col++) {
+                    const td = document.createElement("td");
+
+                    if (board && board[row][col] === "X") {
+                        td.classList.add("hit");
+                    } else if (board && board[row][col] === "O") {
+                        td.classList.add("miss");
+                    } else if (!hideShips && board && board[row][col] !== "") {
+                        td.textContent = board[row][col][0]; // Show first letter of the ship name
+                    }
+
+                    tr.appendChild(td);
+                }
+                table.appendChild(tr);
+            }
+        }
+    </script>
+
 </body>
 </html>
