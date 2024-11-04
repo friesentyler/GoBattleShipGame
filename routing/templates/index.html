@@ -26,6 +26,11 @@
         .miss {
             background-color: lightblue;
         }
+        #game-over {
+            font-size: 24px;
+            font-weight: bold;
+            color: green;
+        }
     </style>
 </head>
 <body>
@@ -51,6 +56,7 @@
         </div>
 
         <div id="move-result"></div>
+        <div id="game-over" style="display: none;"></div>
     </div>
 
     <script>
@@ -60,6 +66,9 @@
         const computerBoardTable = document.getElementById("computer-board");
         const boardsDiv = document.getElementById("boards");
         const moveResultDiv = document.getElementById("move-result");
+        const gameOverDiv = document.getElementById("game-over");
+
+        let gameOver = false; // New flag to track game state
 
         // Start Game Event
         startGameBtn.addEventListener("click", () => {
@@ -70,6 +79,10 @@
             .then(data => {
                 alert(data.message);
                 boardsDiv.style.display = "block";
+                gameOverDiv.style.display = "none"; // Hide game over message
+                moveResultDiv.innerHTML = ""; // Clear previous move results
+                gameOver = false; // Reset game state
+                makeMoveBtn.disabled = false; // Enable move button
                 renderBoard(playerBoardTable, data.player_board);  // Render player board
                 renderBoard(computerBoardTable, data.computer_board);  // Render computer board
             })
@@ -81,6 +94,10 @@
 
         // Make Move Event
         makeMoveBtn.addEventListener("click", () => {
+            if (gameOver) {
+                return; // Prevent moves if the game is over
+            }
+
             const row = document.getElementById("row").value;
             const col = document.getElementById("col").value;
 
@@ -98,6 +115,14 @@
                                            <p>Computer Move: ${data.computer_move.result} at (${data.computer_move.row}, ${data.computer_move.col})</p>`;
                 renderBoard(playerBoardTable, data.player_board);  // Update player board
                 renderBoard(computerBoardTable, data.computer_board);  // Update computer board
+
+                // Check if the game is over
+                if (data.game_over) {
+                    gameOver = true;
+                    makeMoveBtn.disabled = true; // Disable move button when game ends
+                    gameOverDiv.style.display = "block"; // Show game over message
+                    gameOverDiv.textContent = data.message; // Display the game result
+                }
             })
             .catch(error => {
                 console.error('Error making move:', error);
@@ -131,4 +156,3 @@
 
 </body>
 </html>
-

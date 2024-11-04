@@ -110,11 +110,25 @@ func (g *Game) GenerateHiddenBoard() {
 }
 
 func (g *Game) IsWon() bool {
-	// logic to check if the player has won
+	for row := 0; row < BoardSize; row++ {
+		for col := 0; col < BoardSize; col++ {
+			if g.ComputerBoard[row][col] != "" && g.ComputerBoard[row][col] != "X" && g.ComputerBoard[row][col] != "O" {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 func (g *Game) IsLost() bool {
-	// logic to check if the player has lost
+	for row := 0; row < BoardSize; row++ {
+		for col := 0; col < BoardSize; col++ {
+			if g.PlayerBoard[row][col] != "" && g.PlayerBoard[row][col] != "X" && g.PlayerBoard[row][col] != "O" {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 func (g *Game) ComputerMove() (int, int, string) {

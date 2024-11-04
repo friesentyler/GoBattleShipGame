@@ -46,8 +46,46 @@ func main() {
 
 		playerResult := game.PlayerMove(row, col)
 
+		// Check if the player has won after the move
+		if game.IsWon() {
+			c.JSON(http.StatusOK, gin.H{
+				"player_move": gin.H{
+					"row":    row,
+					"col":    col,
+					"result": playerResult,
+				},
+				"player_board": game.PlayerBoard,
+				"computer_board": game.ComputerBoard,
+				"message": "Congratulations! You have sunk all the ships. You win!",
+				"game_over": true,
+			})
+			return
+		}
+
 		compRow, compCol, compResult := game.ComputerMove()
 
+		// Check if the player has lost after the computer's move
+		if game.IsLost() {
+			c.JSON(http.StatusOK, gin.H{
+				"player_move": gin.H{
+					"row":    row,
+					"col":    col,
+					"result": playerResult,
+				},
+				"computer_move": gin.H{
+					"row":    compRow,
+					"col":    compCol,
+					"result": compResult,
+				},
+				"player_board": game.PlayerBoard,
+				"computer_board": game.ComputerBoard,
+				"message": "Game Over! The computer has sunk all your ships. You lose.",
+				"game_over": true,
+			})
+			return
+		}
+
+		// If no one has won or lost, return the updated board and move results
 		c.JSON(http.StatusOK, gin.H{
 			"player_move": gin.H{
 				"row": row,
@@ -61,6 +99,7 @@ func main() {
 			},
 			"player_board": game.PlayerBoard,
 			"computer_board": game.HiddenComputerBoard,
+			"game_over": false,
 		})
 
 	})
