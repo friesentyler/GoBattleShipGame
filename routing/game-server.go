@@ -24,9 +24,11 @@ func main() {
 		game = battleship.Game{}
 		battleship.PlaceShips(&game.PlayerBoard)
 		battleship.PlaceShips(&game.ComputerBoard)
+		game.GenerateHiddenBoard()
 		c.JSON(http.StatusOK, gin.H {
 			"message": "Game Started!",
 			"player_board": game.PlayerBoard,
+			"computer_board": game.HiddenComputerBoard,
 		})
 	})
 
@@ -42,7 +44,7 @@ func main() {
 			return
 		}
 
-		playerResult := game.CheckMove(&game.ComputerBoard, row, col)
+		playerResult := game.PlayerMove(row, col)
 
 		compRow, compCol, compResult := game.ComputerMove()
 
@@ -58,7 +60,7 @@ func main() {
 				"result": compResult,
 			},
 			"player_board": game.PlayerBoard,
-			"computer_board": game.ComputerBoard,
+			"computer_board": game.HiddenComputerBoard,
 		})
 
 	})

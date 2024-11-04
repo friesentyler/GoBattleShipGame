@@ -20,6 +20,7 @@ type Board [BoardSize][BoardSize]string
 type Game struct {
 	PlayerBoard Board
 	ComputerBoard Board
+	HiddenComputerBoard Board
 	PlayerHits int
 	ComputerHits int
 }
@@ -86,6 +87,34 @@ func (g *Game) CheckMove(board *Board, row int, col int) string {
 	}
 	board[row][col] = "O"
 	return "Miss!"
+}
+
+func (g *Game) PlayerMove(row int, col int) string {
+	result := g.CheckMove(&g.ComputerBoard, row, col)
+	g.GenerateHiddenBoard()
+	return result
+}
+
+func (g *Game) GenerateHiddenBoard() {
+	for row := 0; row < BoardSize; row++ {
+		for col := 0; col < BoardSize; col++ {
+			if g.ComputerBoard[row][col] == "X" {
+				g.HiddenComputerBoard[row][col] = "X"
+			} else if g.ComputerBoard[row][col] == "O" {
+				g.HiddenComputerBoard[row][col] = "O"
+			} else {
+				g.HiddenComputerBoard[row][col] = ""
+			}
+		}
+	}
+}
+
+func (g *Game) IsWon() bool {
+	// logic to check if the player has won
+}
+
+func (g *Game) IsLost() bool {
+	// logic to check if the player has lost
 }
 
 func (g *Game) ComputerMove() (int, int, string) {
