@@ -54,6 +54,11 @@ func main() {
 					"col":    col,
 					"result": playerResult,
 				},
+				"computer_move": gin.H{
+					"row":    row,
+					"col":    col,
+					"result": playerResult,
+				},
 				"player_board": game.PlayerBoard,
 				"computer_board": game.ComputerBoard,
 				"message": "Congratulations! You have sunk all the ships. You win!",
